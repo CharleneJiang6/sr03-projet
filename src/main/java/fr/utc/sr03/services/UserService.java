@@ -12,7 +12,7 @@ import java.util.List;
 public class UserService {
 
     @Resource
-    private UserRepository userRepository;
+    private fr.utc.sr03.services.UserRepository userRepository;
 
     // CREATE or UPDATE
     public void saveUser(Users user) {
