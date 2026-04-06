@@ -1,0 +1,24 @@
+# IDE Files
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Compiled Java
+**/*.class
+*.jar
+*.war
+
+# Build outputs
+target/
+build/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# SQLite databases
+*.sqlite
+*.sqlite3
+*.db
