@@ -1,31 +1,32 @@
 package fr.utc.sr03.services;
 
 
-import fr.utc.sr03.model.Users;
+import fr.utc.sr03.model.User;
 import fr.utc.sr03.repository.UserRepository;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     @Resource
-    private fr.utc.sr03.services.UserRepository userRepository;
+    private UserRepository userRepository;
 
     // CREATE or UPDATE
-    public void saveUser(Users user) {
+    public void saveUser(User user) {
         userRepository.save(user);
     }
 
     // READ
-    public Users getUserById(int id) {
+    public User getUserById(int id) {
         return userRepository.findById(id).orElse(null);
     }
-    public Users getUserByEmailAddress(String emailAddress) {return userRepository.findByEmailAddress(emailAddress);}
+    public Optional<User> getUserByMail(String emailAddress) {return userRepository.findByMail(emailAddress);}
 
-    public List<Users> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 

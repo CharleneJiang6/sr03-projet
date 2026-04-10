@@ -12,7 +12,7 @@ public class Participation {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private AppUser user;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
@@ -21,7 +21,7 @@ public class Participation {
     public Participation() {
     }
 
-    public Participation(AppUser user, Channel channel) {
+    public Participation(User user, Channel channel) {
         this.user = user;
         this.channel = channel;
     }
@@ -34,11 +34,11 @@ public class Participation {
         this.id = id;
     }
 
-    public AppUser getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(AppUser user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
