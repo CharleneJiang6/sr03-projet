@@ -1,6 +1,7 @@
 package fr.utc.sr03.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,14 +24,25 @@ public class Channel {
     @Column(name = "expiration_date", nullable = false)
     private LocalDateTime expirationDate;
 
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
     public Channel() {
     }
 
-    public Channel(String title, String description, LocalDateTime creationDate, LocalDateTime expirationDate) {
+    public Channel(
+            String title,
+            String description,
+            LocalDateTime creationDate,
+            LocalDateTime expirationDate,
+            User owner
+    ) {
         this.title = title;
         this.description = description;
         this.creationDate = creationDate;
         this.expirationDate = expirationDate;
+        this.owner = owner;
     }
 
     public Integer getId() {
@@ -71,5 +83,13 @@ public class Channel {
 
     public void setExpirationDate(LocalDateTime expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 }

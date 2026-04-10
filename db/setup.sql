@@ -15,7 +15,9 @@ CREATE TABLE IF NOT EXISTS channel
     title           TEXT     NOT NULL,
     description     TEXT     NOT NULL,
     creation_date   DATETIME NOT NULL,
-    expiration_date DATETIME NOT NULL
+    expiration_date DATETIME NOT NULL,
+    owner_id         INTEGER NOT NULL,
+    FOREIGN KEY (owner_id) REFERENCES user (id)
 );
 
 CREATE TABLE IF NOT EXISTS participation

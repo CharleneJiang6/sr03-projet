@@ -2,6 +2,8 @@ package fr.utc.sr03.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "user")
 public class User {
@@ -22,22 +24,28 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "activated", nullable = false)
+    @Column(name = "activated")
     private Boolean activated = true;
 
-    @Column(name = "admin", nullable = false)
+    @Column(name = "admin")
     private Boolean admin = false;
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Channel> channels; // A user is the creator of multiple channels
+
 
     public User() {
     }
 
-    public User(String firstname, String lastname, String mail, String password, Boolean activated, Boolean admin) {
+    // TODO: password should be encrypted
+    // TODO: should we pass the activated and admin status in the constructor ?
+    public User(String firstname, String lastname, String mail, String password) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.mail = mail;
         this.password = password;
-        this.activated = activated;
-        this.admin = admin;
+//        this.activated = activated;
+//        this.admin = admin;
     }
 
     public Integer getId() {

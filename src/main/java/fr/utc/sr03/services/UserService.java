@@ -15,12 +15,14 @@ public class UserService {
     @Resource
     private UserRepository userRepository;
 
-    // CREATE or UPDATE
-    public void saveUser(User user) {
+    // region CREATE or UPDATE
+    public void createUser(User user) {
         userRepository.save(user);
     }
 
-    // READ
+    // endregion
+
+    // region READ
     public User getUserById(int id) {
         return userRepository.findById(id).orElse(null);
     }
@@ -30,9 +32,12 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    // DELETE
+    // endregion
+
+    // region DELETE
     public void deleteUser(int id) {
         userRepository.deleteById(id);
     }
 
+    // endregion
 }
