@@ -1,3 +1,5 @@
+// Spring MVC controller calling Thymeleaf templates to render Admin interface.
+
 package fr.utc.sr03.controller;
 
 
@@ -72,8 +74,7 @@ public class WebController {
                 model.addAttribute("error", "Invalid password");
                 return "user-login"; // Show the login form again with an error message
             }
-        }
-        else {
+        } else {
             model.addAttribute("error", "User not found");
             return "user-login"; // Show the login form again with an error message
         }

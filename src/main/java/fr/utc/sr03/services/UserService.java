@@ -1,6 +1,5 @@
 package fr.utc.sr03.services;
 
-
 import fr.utc.sr03.model.User;
 import fr.utc.sr03.repository.UserRepository;
 import jakarta.annotation.Resource;
@@ -20,6 +19,7 @@ public class UserService {
     public void createUser(User user) {
         userRepository.save(user);
     }
+
     public User saveUser(User user) {
         return userRepository.save(user);
     }
@@ -97,12 +97,14 @@ public class UserService {
     public User getUserById(int id) {
         return userRepository.findById(id).orElse(null);
     }
-    public Optional<User> getUserByMail(String emailAddress) {return userRepository.findByMail(emailAddress);}
+
+    public Optional<User> getUserByMail(String emailAddress) {
+        return userRepository.findByMail(emailAddress);
+    }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-
 
     public List<User> getActiveUsers() {
         return userRepository.findByActivatedTrue();
@@ -120,29 +122,57 @@ public class UserService {
         return userRepository.findByAdminFalse();
     }
 
-    public List<User> searchUsers(String firstname, String lastname, String email) {
+    public List<User> searchUsers(
+            Boolean admin,
+            Boolean activated,
+            String firstname,
+            String lastname,
+            String email
+    ) {
+        //  If the email is present, find by email first
         if (email != null && !email.isBlank()) {
             return userRepository.findByMail(email)
-                    .map(List::of)
-                    .orElse(List.of());
+                    .stream() // Iterate over each element
+                    .filter(u -> filterAdmin(u, admin)) // Filter to keep relevant element only
+                    .filter(u -> filterActivated(u, activated))
+                    .toList();
         }
+
+        List<User> baseUsers;
 
         if (firstname != null && !firstname.isBlank()
                 && lastname != null && !lastname.isBlank()) {
-            return userRepository.findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCase(firstname, lastname);
+            baseUsers = userRepository
+                    .findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCase(firstname, lastname);
+        } else if (firstname != null && !firstname.isBlank()) {
+            baseUsers = userRepository
+                    .findByFirstnameContainingIgnoreCase(firstname);
+        } else if (lastname != null && !lastname.isBlank()) {
+            baseUsers = userRepository
+                    .findByLastnameContainingIgnoreCase(lastname);
+        } else {
+            baseUsers = userRepository.findAll();
         }
 
-        if (firstname != null && !firstname.isBlank()) {
-            return userRepository.findByFirstnameContainingIgnoreCase(firstname);
-        }
-
-        if (lastname != null && !lastname.isBlank()) {
-            return userRepository.findByLastnameContainingIgnoreCase(lastname);
-        }
-
-        return userRepository.findAll();
+        return baseUsers.stream()
+                .filter(u -> filterAdmin(u, admin))
+                .filter(u -> filterActivated(u, activated))
+                .toList();
     }
 
+    private boolean filterAdmin(User user, Boolean admin) {
+        if (admin == null) {
+            return true;
+        }
+        return admin.equals(user.getAdmin());
+    }
+
+    private boolean filterActivated(User user, Boolean activated) {
+        if (activated == null) {
+            return true;
+        }
+        return activated.equals(user.getActivated());
+    }
 
     // endregion
 
