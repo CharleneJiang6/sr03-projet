@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="https://www.thymeleaf.org">
+<body>
+<nav th:fragment="navbar" class="admin-navbar">
+    <div class="admin-logo">SR03 Admin</div>
+
+    <div class="admin-links">
+        <a th:href="@{/admin}">Accueil</a>
+        <a th:href="@{/admin/users}">Utilisateurs</a>
+        <a th:href="@{/admin/users/create}">Créer</a>
+        <a th:href="@{/admin/users/disabled}">Désactivés</a>
+        <a th:href="@{/admin/logout}" class="logout">Déconnexion</a>
+    </div>
+</nav>
+</body>
+</html>
