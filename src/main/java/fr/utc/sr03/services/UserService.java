@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 public class UserService {
@@ -182,11 +183,15 @@ public class UserService {
     }
 
     public boolean deleteUserById(int id) {
+        System.out.println("in userservice");
         if (!userRepository.existsById(id)) {
+            System.out.println("user doesn't exist");
             return false;
         }
 
+        System.out.println("in userservice 2");
         userRepository.deleteById(id);
+        System.out.println("in userservice 3");
         return true;
     }
 

@@ -28,3 +28,5 @@ CREATE TABLE IF NOT EXISTS participation
     FOREIGN KEY (user_id) REFERENCES user (id),
     FOREIGN KEY (channel_id) REFERENCES channel (id)
     );
+
+drop table channel;

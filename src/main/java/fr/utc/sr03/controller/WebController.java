@@ -7,6 +7,8 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import fr.utc.sr03.model.User;
 import fr.utc.sr03.services.UserService;
 import jakarta.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class WebController {
 
+    private static final Logger log = LoggerFactory.getLogger(WebController.class);
     @Resource
     private UserService userService;
 
@@ -175,17 +178,29 @@ public class WebController {
     @GetMapping(value = "/admin/users/delete/{id}")
     public String deleteUser(@PathVariable int id) {
 
+        System.out.println("here");
         User user = userService.getUserById(id);
+        log.info("user{}", user);
 
-        if (user != null && user.getAdmin()
-                && userService.getAdminUsers().size() <= 1) {
+        if (user == null) {
+            log.info("user in null");
             return "redirect:/admin/users";
         }
 
+        if (Boolean.TRUE.equals(user.getAdmin()) && userService.getAdminUsers().size() <= 1) {
+            log.info("this is the last admin");
+            return "redirect:/admin/users";
+        }
+
+        System.out.println("here2");
+
         userService.deleteUserById(id);
+
+        System.out.println("here3");
 
         return "redirect:/admin/users";
     }
+
 
 
 

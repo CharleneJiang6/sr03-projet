@@ -23,4 +23,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findByAdminTrue();
     List<User> findByAdminFalse();
 
+    void deleteById(Integer id);
+
 }
