@@ -183,15 +183,12 @@ public class UserService {
     }
 
     public boolean deleteUserById(int id) {
-        System.out.println("in userservice");
         if (!userRepository.existsById(id)) {
             System.out.println("user doesn't exist");
             return false;
         }
 
-        System.out.println("in userservice 2");
         userRepository.deleteById(id);
-        System.out.println("in userservice 3");
         return true;
     }
 

@@ -178,7 +178,6 @@ public class WebController {
     @GetMapping(value = "/admin/users/delete/{id}")
     public String deleteUser(@PathVariable int id) {
 
-        System.out.println("here");
         User user = userService.getUserById(id);
         log.info("user{}", user);
 
@@ -192,11 +191,7 @@ public class WebController {
             return "redirect:/admin/users";
         }
 
-        System.out.println("here2");
-
         userService.deleteUserById(id);
-
-        System.out.println("here3");
 
         return "redirect:/admin/users";
     }
