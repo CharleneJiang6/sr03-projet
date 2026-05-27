@@ -16,7 +16,7 @@ public interface ParticipationRepository extends JpaRepository<Participation, In
 
     Optional<Participation> findByUserAndChannel(User user, Channel channel);
 
-    boolean existsByUserAndChannel(User user, Channel channel);
+    boolean existsByUserIdAndChannelId(Integer userId, Integer channelId);
 
     void deleteByUserAndChannel(User user, Channel channel);
 }
