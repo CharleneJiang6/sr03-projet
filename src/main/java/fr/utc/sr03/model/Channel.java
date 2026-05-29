@@ -16,7 +16,7 @@ public class Channel {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = true)
     private String description;
 
     @Column(name = "creation_date", nullable = false)

@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS channel
 (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     title           TEXT     NOT NULL,
-    description     TEXT     NOT NULL,
+    description     TEXT     ,
     creation_date   DATETIME NOT NULL,
     expiration_date DATETIME NOT NULL,
     owner_id         INTEGER NOT NULL,
@@ -53,3 +53,5 @@ CREATE TABLE IF NOT EXISTS invitation
     FOREIGN KEY (receiver_id) REFERENCES user(id),
     FOREIGN KEY (channel_id) REFERENCES channel(id)
 );
+
+Drop Table channel;

@@ -52,19 +52,6 @@ public class ChannelApiController {
         return ResponseEntity.ok(updatedChannel);
     }
 
-    @PatchMapping("/{id}/expiration")
-    public ResponseEntity<Channel> updateExpirationDate(
-            @PathVariable int id,
-            @RequestBody Map<String, String> body
-    ) {
-        LocalDateTime expirationDate = LocalDateTime.parse(body.get("expirationDate"));
-
-        Channel channel = channelService.updateExpirationDate(id, expirationDate);
-        if (channel == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(channel);
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteChannel(@PathVariable int id) {
