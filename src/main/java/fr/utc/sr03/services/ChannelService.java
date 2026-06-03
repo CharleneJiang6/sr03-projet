@@ -3,6 +3,7 @@ package fr.utc.sr03.services;
 import fr.utc.sr03.model.Channel;
 import fr.utc.sr03.model.Participation;
 import fr.utc.sr03.model.User;
+import fr.utc.sr03.model.enums.ChannelType;
 import fr.utc.sr03.repository.ChannelRepository;
 import fr.utc.sr03.repository.ParticipationRepository;
 import fr.utc.sr03.repository.UserRepository;
@@ -10,6 +11,8 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +31,28 @@ public class ChannelService {
     // Region CREATE / UPDATE
 
     public Channel saveChannel(Channel channel) {
+        if (channel.getCreationDate() == null || channel.getExpirationDate() == null) {
+            throw new IllegalArgumentException("Les dates de création et d'expiration sont requises");
+        }
+
+        if (!channel.getExpirationDate().isAfter(channel.getCreationDate())) {
+            throw new IllegalArgumentException("La date de fin doit être postérieure à la date de début");
+        }
+
+        if (channel.getTitle() == null || channel.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Le titre est requis");
+        }
+
+        if (channel.getType() == null) {
+            throw new IllegalArgumentException("Le type de channel est requis. Valeurs autorisées: GROUP, PRIVATE");
+        }
+
+        if (channel.getOwner() == null || channel.getOwner().getId() == null) {
+            throw new IllegalArgumentException("Le propriétaire du channel est requis");
+        } else if (!userRepository.existsById(channel.getOwner().getId())) {
+            throw new IllegalArgumentException("Le propriétaire du channel n'existe pas");
+        }
+
         return channelRepository.save(channel);
     }
 
@@ -47,11 +72,11 @@ public class ChannelService {
         }
 
         if (updates.containsKey("creationDate")) {
-            channel.setCreationDate(LocalDateTime.parse((String) updates.get("creationDate")));
+            channel.setCreationDate(OffsetDateTime.parse((String) updates.get("creationDate")).toLocalDateTime());
         }
 
         if (updates.containsKey("expirationDate")) {
-            channel.setExpirationDate(LocalDateTime.parse((String) updates.get("expirationDate")));
+            channel.setExpirationDate(OffsetDateTime.parse((String) updates.get("expirationDate")).toLocalDateTime());
         }
 
         return channelRepository.save(channel);
@@ -84,11 +109,11 @@ public class ChannelService {
     }
 
     public List<Channel> getActiveChannels() {
-        return channelRepository.findByExpirationDateAfter(LocalDateTime.now());
+        return channelRepository.findByExpirationDateAfter(LocalDateTime.now(ZoneOffset.UTC));
     }
 
     public List<Channel> getExpiredChannels() {
-        return channelRepository.findByExpirationDateBefore(LocalDateTime.now());
+        return channelRepository.findByExpirationDateBefore(LocalDateTime.now(ZoneOffset.UTC));
     }
 
     public List<Channel> getChannels(Integer userId, String type, String status) {
