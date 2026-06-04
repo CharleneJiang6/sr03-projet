@@ -28,6 +28,9 @@ public class ChannelService {
     @Resource
     private ParticipationRepository participationRepository;
 
+    @Resource
+    private ParticipationService participationService;
+
     public Channel saveChannel(Channel channel) {
         if (channel.getCreationDate() == null || channel.getExpirationDate() == null) {
             throw new IllegalArgumentException("Les dates de création et d'expiration sont requises");
@@ -51,7 +54,14 @@ public class ChannelService {
             throw new IllegalArgumentException("Le propriétaire du channel n'existe pas");
         }
 
-        return channelRepository.save(channel);
+        Channel savedChannel = channelRepository.save(channel);
+
+        // add the owner as a participant of his own channel
+        participationService.addParticipation(
+                savedChannel.getOwner().getId(),
+                savedChannel.getId()
+        );
+        return savedChannel;
     }
 
     public Channel updateChannel(int channelId, Map<String, Object> updates) {
@@ -172,6 +182,9 @@ public class ChannelService {
         if (!channelRepository.existsById(channelId)) {
             return false;
         }
+
+        // Remove all participations for this channel before deleting it
+        participationRepository.deleteByChannelId(channelId);
 
         channelRepository.deleteById(channelId);
         return true;

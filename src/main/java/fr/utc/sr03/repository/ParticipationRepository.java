@@ -20,4 +20,6 @@ public interface ParticipationRepository extends JpaRepository<Participation, In
     boolean existsByUserIdAndChannelId(Integer userId, Integer channelId);
 
     List<Participation> findByUser(User user);
+
+    void deleteByChannelId(int channelId);
 }
