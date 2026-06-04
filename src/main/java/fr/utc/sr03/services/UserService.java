@@ -16,7 +16,7 @@ public class UserService {
     @Resource
     private UserRepository userRepository;
 
-    // region CREATE or UPDATE
+
     public void createUser(User user) {
         userRepository.save(user);
     }
@@ -92,9 +92,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // endregion
 
-    // region READ
     public User getUserById(int id) {
         return userRepository.findById(id).orElse(null);
     }
@@ -175,9 +173,7 @@ public class UserService {
         return activated.equals(user.getActivated());
     }
 
-    // endregion
 
-    // region DELETE
     public void deleteUser(int id) {
         userRepository.deleteById(id);
     }
@@ -191,6 +187,4 @@ public class UserService {
         userRepository.deleteById(id);
         return true;
     }
-
-    // endregion
 }

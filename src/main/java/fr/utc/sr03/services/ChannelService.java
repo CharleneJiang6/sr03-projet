@@ -28,8 +28,6 @@ public class ChannelService {
     @Resource
     private ParticipationRepository participationRepository;
 
-    // Region CREATE / UPDATE
-
     public Channel saveChannel(Channel channel) {
         if (channel.getCreationDate() == null || channel.getExpirationDate() == null) {
             throw new IllegalArgumentException("Les dates de création et d'expiration sont requises");
@@ -92,9 +90,7 @@ public class ChannelService {
         channel.setExpirationDate(expirationDate);
         return channelRepository.save(channel);
     }
-    // endregion
 
-    // Region READ
 
     public Channel getChannelById(int channelId) {
         return channelRepository.findById(channelId).orElse(null);
@@ -170,9 +166,7 @@ public class ChannelService {
                 .distinct()
                 .toList();
     }
-    // endregion
 
-    // Region DELETE
 
     public boolean deleteChannelById(int channelId) {
         if (!channelRepository.existsById(channelId)) {
@@ -182,6 +176,4 @@ public class ChannelService {
         channelRepository.deleteById(channelId);
         return true;
     }
-
-    // endregion
 }
