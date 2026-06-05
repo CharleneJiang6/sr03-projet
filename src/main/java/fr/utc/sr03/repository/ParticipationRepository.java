@@ -22,4 +22,6 @@ public interface ParticipationRepository extends JpaRepository<Participation, In
     List<Participation> findByUser(User user);
 
     void deleteByChannelId(int channelId);
+
+
 }

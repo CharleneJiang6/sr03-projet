@@ -80,6 +80,58 @@ public class ParticipationApiController {
         }
     }
 
+    /**
+     * Create a participation for a given channel using a user email.
+     * Expected body:
+     * {
+     * "userMail": "user@example.com",
+     * "channelId": "42"
+     * }
+     */
+    @PostMapping("/by-email")
+    public ResponseEntity<?> addParticipationByEmail(
+            @RequestBody Map<String, String> body
+    ) {
+        try {
+            if (!body.containsKey("userMail") || !body.containsKey("channelId")) {
+                return ResponseEntity.badRequest().body(
+                        new ApiResponse(
+                                "Les champs 'userMail' et 'channelId' sont obligatoires.",
+                                400
+                        )
+                );
+            }
+
+            String userMail = body.get("userMail");
+            int channelId;
+            try {
+                channelId = Integer.parseInt(body.get("channelId"));
+            } catch (NumberFormatException e) {
+                return ResponseEntity.badRequest().body(
+                        new ApiResponse(
+                                "L'identifiant 'channelId' doit être un entier.",
+                                400
+                        )
+                );
+            }
+
+            Participation participation = participationService.addParticipationByEmail(userMail, channelId);
+            return ResponseEntity.ok(ParticipationDTO.fromEntity(participation));
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(
+                    new ApiResponse(e.getMessage(), 400)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(
+                    new ApiResponse(
+                            "Erreur inattendue lors de la création de la participation.",
+                            500
+                    )
+            );
+        }
+    }
+
     @DeleteMapping
     public ResponseEntity<?> removeParticipation(
             @RequestParam Integer userId,

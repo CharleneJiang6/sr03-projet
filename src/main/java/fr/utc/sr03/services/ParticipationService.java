@@ -8,6 +8,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ParticipationService {
@@ -129,6 +130,19 @@ public class ParticipationService {
         return participationRepository.existsByUserIdAndChannelId(userId, channelId);
     }
 
+    public Participation addParticipationByEmail(String userMail, int channelId) {
+        Optional<User> user = userService.getUserByMail(userMail);
+        if (user.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Aucun utilisateur trouvé avec l'adresse e-mail : " + userMail
+            );
+        }
+
+        getExistingUser(user.get().getId());
+
+        return addParticipation(user.get().getId(), channelId);
+    }
+
     /**
      * Returns an existing user or throws an exception if the user does not exist.
      */
@@ -154,4 +168,5 @@ public class ParticipationService {
         }
         return channel;
     }
+
 }
