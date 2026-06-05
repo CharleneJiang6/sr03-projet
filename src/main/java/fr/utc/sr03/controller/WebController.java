@@ -9,7 +9,6 @@ import fr.utc.sr03.services.UserService;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +70,7 @@ public class WebController {
 
         User createdUser = userService.saveUser(user);
         model.addAttribute("user", createdUser);
-        return "usercreated"; // Show the results of creating a new user
+        return "admin/usercreated"; // Show the results of creating a new user
     }
 
 

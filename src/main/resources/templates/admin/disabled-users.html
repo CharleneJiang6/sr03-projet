@@ -16,7 +16,25 @@
         table { width: 100%; border-collapse: collapse; margin-top: 25px; }
         th { color: #d63384; text-align: left; padding: 14px; border-bottom: 2px solid #f7d8e8; }
         td { padding: 14px; border-bottom: 1px solid #f2edf0; }
-        .btn { display: inline-block; padding: 9px 14px; border-radius: 10px; background: #d63384; color: white; text-decoration: none; font-size: 13px; }
+
+        .btn {
+            display: inline-block;
+            padding: 9px 14px;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .green {
+            background: #198754;
+        }
+
+        .green:hover {
+            background: #157347;
+        }
     </style>
 </head>
 <body>
@@ -44,7 +62,10 @@
                 <td th:text="${user.mail}"></td>
                 <td th:text="${user.admin}"></td>
                 <td>
-                    <a class="btn" th:href="@{'/admin/users/enable/' + ${user.id}}">Réactiver</a>
+                    <a class="btn green"
+                       th:href="@{'/admin/users/enable/' + ${user.id}}">
+                        Réactiver
+                    </a>
                 </td>
             </tr>
         </table>

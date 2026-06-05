@@ -16,10 +16,52 @@
         table { width: 100%; border-collapse: collapse; margin-top: 25px; }
         th { color: #d63384; text-align: left; padding: 14px; border-bottom: 2px solid #f7d8e8; }
         td { padding: 14px; border-bottom: 1px solid #f2edf0; }
-        .btn { display: inline-block; padding: 8px 12px; border-radius: 10px; text-decoration: none; color: white; font-size: 13px; margin: 3px; }
-        .pink { background: #d63384; }
-        .gray { background: #6c757d; }
-        .red { background: #dc3545; }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 3px;
+            transition: 0.2s ease;
+        }
+
+        .green {
+            background: #198754;
+        }
+
+        .green:hover {
+            background: #157347;
+        }
+
+        .orange {
+            background: #fd7e14;
+        }
+
+        .orange:hover {
+            background: #e96b00;
+        }
+
+        .red {
+            background: #dc3545;
+        }
+
+        .red:hover {
+            background: #bb2d3b;
+        }
+
+        .status-active {
+            color: #198754;
+            font-weight: 700;
+        }
+
+        .status-disabled {
+            color: #fd7e14;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -46,13 +88,32 @@
                 <td th:text="${user.firstname}"></td>
                 <td th:text="${user.lastname}"></td>
                 <td th:text="${user.mail}"></td>
-                <td th:text="${user.activated}"></td>
-                <td th:text="${user.admin}"></td>
+
                 <td>
-                    <a class="btn gray" th:href="@{'/admin/users/disable/' + ${user.id}}">Désactiver</a>
-                    <a class="btn pink" th:href="@{'/admin/users/enable/' + ${user.id}}">Activer</a>
-                    <a class="btn red" th:href="@{'/admin/users/delete/' + ${user.id}}"
-                       onclick="return confirm('Supprimer cet utilisateur ?')">Supprimer</a>
+                    <span th:if="${user.activated}" class="status-active">Oui</span>
+                    <span th:unless="${user.activated}" class="status-disabled">Non</span>
+                </td>
+
+                <td th:text="${user.admin}"></td>
+
+                <td>
+                    <a th:if="${user.activated}"
+                       class="btn orange"
+                       th:href="@{'/admin/users/disable/' + ${user.id}}">
+                        Désactiver
+                    </a>
+
+                    <a th:unless="${user.activated}"
+                       class="btn green"
+                       th:href="@{'/admin/users/enable/' + ${user.id}}">
+                        Activer
+                    </a>
+
+                    <a class="btn red"
+                       th:href="@{'/admin/users/delete/' + ${user.id}}"
+                       onclick="return confirm('Supprimer cet utilisateur ?')">
+                        Supprimer
+                    </a>
                 </td>
             </tr>
         </table>
