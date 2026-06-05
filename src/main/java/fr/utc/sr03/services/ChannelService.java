@@ -15,6 +15,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ChannelService {
@@ -27,9 +28,6 @@ public class ChannelService {
 
     @Resource
     private ParticipationRepository participationRepository;
-
-    @Resource
-    private ParticipationService participationService;
 
     public Channel saveChannel(Channel channel) {
         if (channel.getCreationDate() == null || channel.getExpirationDate() == null) {
@@ -55,12 +53,10 @@ public class ChannelService {
         }
 
         Channel savedChannel = channelRepository.save(channel);
+        User creator = userRepository.findById(channel.getOwner().getId()).get();
 
         // add the owner as a participant of his own channel
-        participationService.addParticipation(
-                savedChannel.getOwner().getId(),
-                savedChannel.getId()
-        );
+        participationRepository.save(new Participation(creator, savedChannel));
         return savedChannel;
     }
 
@@ -173,7 +169,13 @@ public class ChannelService {
                         createdChannels.stream(),
                         invitedChannels.stream()
                 )
-                .distinct()
+                .collect(Collectors.toMap(
+                        Channel::getId,
+                        channel -> channel,
+                        (existing, duplicate) -> existing
+                ))
+                .values()
+                .stream()
                 .toList();
     }
 
