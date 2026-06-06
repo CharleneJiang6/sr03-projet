@@ -5,9 +5,11 @@ import fr.utc.sr03.model.Participation;
 import fr.utc.sr03.model.User;
 import fr.utc.sr03.repository.ParticipationRepository;
 import jakarta.annotation.Resource;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -21,6 +23,9 @@ public class ParticipationService {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private SimpMessagingTemplate messagingTemplate;
 
     /**
      * Create a participation for a given user and channel.
@@ -91,6 +96,16 @@ public class ParticipationService {
         }
 
         participationRepository.delete(participation);
+
+        messagingTemplate.convertAndSend(
+                "/topic/channel/" + channelId + "/members",
+                Optional.of(Map.of(
+                                "type", "MEMBER_REMOVED",
+                                "userId", userId,
+                                "channelId", channelId
+                        )
+                )
+        );
         return true;
     }
 

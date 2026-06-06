@@ -3,7 +3,9 @@ package fr.utc.sr03.services;
 import fr.utc.sr03.model.*;
 import fr.utc.sr03.model.enums.InvitationStatus;
 import fr.utc.sr03.repository.InvitationRepository;
+import fr.utc.sr03.model.ParticipationDTO;
 import jakarta.annotation.Resource;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,12 @@ public class InvitationService {
 
     @Resource
     private ChannelService channelService;
+
+    @Resource
+    private ParticipationService participationService;
+
+    @Resource
+    private SimpMessagingTemplate messagingTemplate;
 
     public List<Invitation> getAllInvitations() {
         return invitationRepository.findAll();
@@ -64,7 +72,23 @@ public class InvitationService {
         }
 
         invitation.setStatus(InvitationStatus.ACCEPTED);
-        return invitationRepository.save(invitation);
+        invitationRepository.save(invitation);
+        Participation participation = participationService.addParticipation(
+                invitation.getReceiver().getId(),
+                invitation.getChannel().getId()
+        );
+
+        // As a new member is being successfully added to a channel,
+        // all clients subscribed to the channel's members topic are notified with the new member's information.
+        if (participation != null) {
+            Integer channelId = invitation.getChannel().getId();
+            messagingTemplate.convertAndSend(
+                    "/topic/channel/" + channelId + "/members",
+                    ParticipationDTO.fromEntity(participation)
+            );
+        }
+
+        return invitation;
     }
 
     public Invitation declineInvitation(Integer id) {
