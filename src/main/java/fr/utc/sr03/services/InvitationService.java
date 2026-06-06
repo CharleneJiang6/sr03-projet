@@ -86,4 +86,17 @@ public class InvitationService {
         invitationRepository.deleteById(id);
         return true;
     }
+
+    public Invitation inviteUserByEmail(String senderId, String receiverEmail, String channelId) {
+        User sender = userService.getUserById(Integer.parseInt(senderId));
+        User receiver = userService.getUserByMail(receiverEmail).orElse(null);
+        Channel channel = channelService.getChannelById(Integer.parseInt(channelId));
+
+        if (sender == null || receiver == null || channel == null) {
+            return null;
+        }
+
+        Invitation invitation = new Invitation(sender, receiver, channel, InvitationStatus.PENDING, LocalDateTime.now());
+        return invitationRepository.save(invitation);
+    }
 }

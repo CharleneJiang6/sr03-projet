@@ -17,7 +17,6 @@ public class InvitationApiController {
     @Resource
     private InvitationService invitationService;
 
-    // not sure if it's useful
     @GetMapping
     public List<Invitation> getAllInvitations() {
         return invitationService.getAllInvitations();
@@ -40,6 +39,22 @@ public class InvitationApiController {
         Integer channelId = body.get("channelId");
 
         Invitation invitation = invitationService.createInvitation(senderId, receiverId, channelId);
+
+        if (invitation == null) {
+            return ResponseEntity.badRequest().body("Utilisateur ou channel introuvable.");
+        }
+
+        return ResponseEntity.ok(invitation);
+    }
+
+    // Invite a user to a channel by its email
+    @PostMapping("by-email")
+    public ResponseEntity<?> createInvitationByEmail(@RequestBody Map<String, String> body) {
+        String senderId = body.get("senderId");
+        String receiverEmail = body.get("receiverMail");
+        String channelId = body.get("channelId");
+
+        Invitation invitation = invitationService.inviteUserByEmail(senderId, receiverEmail, channelId);
 
         if (invitation == null) {
             return ResponseEntity.badRequest().body("Utilisateur ou channel introuvable.");
