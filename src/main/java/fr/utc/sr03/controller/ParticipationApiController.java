@@ -2,7 +2,7 @@ package fr.utc.sr03.controller;
 
 import fr.utc.sr03.model.ApiResponse;
 import fr.utc.sr03.model.Participation;
-import fr.utc.sr03.model.ParticipationDTO;
+import fr.utc.sr03.model.dto.ParticipationDTO;
 import fr.utc.sr03.services.ParticipationService;
 import jakarta.annotation.Resource;
 import org.springframework.http.ResponseEntity;

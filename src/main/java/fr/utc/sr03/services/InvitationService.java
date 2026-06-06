@@ -3,7 +3,7 @@ package fr.utc.sr03.services;
 import fr.utc.sr03.model.*;
 import fr.utc.sr03.model.enums.InvitationStatus;
 import fr.utc.sr03.repository.InvitationRepository;
-import fr.utc.sr03.model.ParticipationDTO;
+import fr.utc.sr03.model.dto.ParticipationDTO;
 import jakarta.annotation.Resource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;

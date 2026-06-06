@@ -16,6 +16,10 @@ public class ApiResponse {
         this(message, status, null);
     }
 
+    public ApiResponse(String message) {
+        this.message = message;
+    }
+
     public ApiResponse(String message, int status, Map<String, Object> details) {
         this.message = message;
         this.status = status;

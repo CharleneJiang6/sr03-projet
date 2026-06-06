@@ -1,60 +1,40 @@
 package fr.utc.sr03.services;
 
 import fr.utc.sr03.model.User;
+import fr.utc.sr03.model.dto.UserDTO;
+import fr.utc.sr03.model.dto.UserUpdateRequest;
 import fr.utc.sr03.repository.UserRepository;
 import jakarta.annotation.Resource;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 @Service
 public class UserService {
 
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(UserService.class);
+
     @Resource
     private UserRepository userRepository;
 
-
-    public void createUser(User user) {
-        userRepository.save(user);
-    }
+    @Resource
+    private PasswordService passwordService;
 
     public User saveUser(User user) {
         return userRepository.save(user);
     }
 
-    public User updateUser(int id, Map<String, Object> updates) {
+    public User updateUser(int id, UserUpdateRequest dto) {
         User user = getUserById(id);
+        if (user == null) { return null; }
 
-        if (user == null) {
-            return null;
-        }
-
-        if (updates.containsKey("firstname")) {
-            user.setFirstname((String) updates.get("firstname"));
-        }
-
-        if (updates.containsKey("lastname")) {
-            user.setLastname((String) updates.get("lastname"));
-        }
-
-        if (updates.containsKey("mail")) {
-            user.setMail((String) updates.get("mail"));
-        }
-
-        if (updates.containsKey("password")) {
-            user.setPassword((String) updates.get("password"));
-        }
-
-        if (updates.containsKey("activated")) {
-            user.setActivated((Boolean) updates.get("activated"));
-        }
-
-        if (updates.containsKey("admin")) {
-            user.setAdmin((Boolean) updates.get("admin"));
-        }
+        if (dto.firstname() != null) user.setFirstname(dto.firstname());
+        if (dto.lastname() != null) user.setLastname(dto.lastname());
+        if (dto.mail() != null) user.setMail(dto.mail());
+        if (dto.activated() != null) user.setActivated(dto.activated());
+        if (dto.admin() != null) user.setAdmin(dto.admin());
 
         return userRepository.save(user);
     }
@@ -80,18 +60,6 @@ public class UserService {
         user.setAdmin(admin);
         return userRepository.save(user);
     }
-
-    public User updatePassword(int id, String newPassword) {
-        User user = getUserById(id);
-
-        if (user == null) {
-            return null;
-        }
-
-        user.setPassword(newPassword);
-        return userRepository.save(user);
-    }
-
 
     public User getUserById(int id) {
         return userRepository.findById(id).orElse(null);
@@ -173,7 +141,6 @@ public class UserService {
         return activated.equals(user.getActivated());
     }
 
-
     public void deleteUser(int id) {
         userRepository.deleteById(id);
     }
@@ -186,5 +153,73 @@ public class UserService {
 
         userRepository.deleteById(id);
         return true;
+    }
+
+    // NOTE: For this project, we are not implementing the full email confirmation flow
+    // (creation of a confirmation token, sending an email via JakartaEmail, and a confirmation endpoint
+    // to activate the user). In a real production system, we would have created the user with activated = false.
+    public Optional<UserDTO> createRegularUser(String firstname, String lastname, String email, String password) {
+        // Verify email uniqueness
+        if (userRepository.findByMail(email).isPresent()) {
+            return Optional.empty();
+        }
+
+        // Verify password security
+        String passwordValidation = passwordService.validatePasswordSecurity(password);
+        if (!passwordValidation.isEmpty()) {
+            throw new IllegalArgumentException(passwordValidation);
+        }
+
+        User user = new User(firstname, lastname, email, passwordService.encryptPassword(password));
+        User savedUser = userRepository.save(user);
+        return Optional.of(new UserDTO(savedUser));
+    }
+
+    // Connect a user to the application by checking if the email and password are correct
+    public Optional<UserDTO> loginUser(String email, String password) {
+        if (!isValidMail(email)) {
+            log.warn("Tentative de connexion avec email invalide: {}", email);
+            return Optional.empty();
+        }
+
+        return userRepository.findByMail(email)
+                .filter(User::getActivated) // tu peux refuser les comptes désactivés par exemple
+                .filter(user -> passwordService.verifyPassword(password, user.getPassword()))
+                .map(user -> {
+                    log.info("Utilisateur {} connecté avec succès", email);
+                    return new UserDTO(user);
+                });
+    }
+
+    public static class InvalidPasswordException extends RuntimeException {
+        public InvalidPasswordException(String message) {
+            super(message);
+        }
+    }
+
+    public User updatePassword(int id, String rawPassword) {
+        if (rawPassword == null || rawPassword.isBlank()) {
+            throw new InvalidPasswordException("Le mot de passe ne peut pas être vide.");
+        }
+
+        String validationMessage = passwordService.validatePasswordSecurity(rawPassword);
+        if (!validationMessage.isEmpty()) {
+            throw new InvalidPasswordException(validationMessage);
+        }
+
+        User user = getUserById(id);
+        if (user == null) {
+            return null;
+        }
+
+        String encryptedPassword = passwordService.encryptPassword(rawPassword);
+        user.setPassword(encryptedPassword);
+        return userRepository.save(user);
+    }
+
+    private boolean isValidMail(String email) {
+        if (email == null || email.isBlank()) {return false;}
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        return email.matches(emailRegex);
     }
 }

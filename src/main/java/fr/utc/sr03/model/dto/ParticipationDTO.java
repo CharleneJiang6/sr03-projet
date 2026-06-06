@@ -1,4 +1,4 @@
-package fr.utc.sr03.model;
+package fr.utc.sr03.model.dto;
 
 import fr.utc.sr03.model.Participation;
 import fr.utc.sr03.model.User;

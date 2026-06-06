@@ -3,6 +3,7 @@ package fr.utc.sr03.model;
 import jakarta.persistence.*;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "user")
@@ -21,6 +22,7 @@ public class User {
     @Column(name = "mail", nullable = false)
     private String mail;
 
+    @JsonIgnore // Ignore the password field during JSON serialization for security concerns
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -37,15 +39,11 @@ public class User {
     public User() {
     }
 
-    // TODO: password should be encrypted
-    // TODO: should we pass the activated and admin status in the constructor ?
     public User(String firstname, String lastname, String mail, String password) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.mail = mail;
         this.password = password;
-//        this.activated = activated;
-//        this.admin = admin;
     }
 
     public Integer getId() {

@@ -1,6 +1,7 @@
-package fr.utc.sr03.model;
+package fr.utc.sr03.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import fr.utc.sr03.model.User;
 
 // This class is used to transfer user data without exposing sensitive information like password
 @JsonPropertyOrder({"id", "firstname", "lastname", "mail", "admin", "activated"})
