@@ -28,7 +28,9 @@ public class UserService {
 
     public User updateUser(int id, UserUpdateRequest dto) {
         User user = getUserById(id);
-        if (user == null) { return null; }
+        if (user == null) {
+            return null;
+        }
 
         if (dto.firstname() != null) user.setFirstname(dto.firstname());
         if (dto.lastname() != null) user.setLastname(dto.lastname());
@@ -154,10 +156,11 @@ public class UserService {
         return true;
     }
 
+    // Helper function to add a new user to database with verification beforehand.
     // NOTE: For this project, we are not implementing the full email confirmation flow
     // (creation of a confirmation token, sending an email via JakartaEmail, and a confirmation endpoint
     // to activate the user). In a real production system, we would have created the user with activated = false.
-    public Optional<UserDTO> createRegularUser(String firstname, String lastname, String email, String password) {
+    private Optional<User> createInitialUser(String firstname, String lastname, String email, String password) {
         // Verify email uniqueness
         email = email.toLowerCase();
         if (userRepository.findByMail(email).isPresent()) {
@@ -171,8 +174,29 @@ public class UserService {
         }
 
         User user = new User(firstname, lastname, email, passwordService.encryptPassword(password));
-        User savedUser = userRepository.save(user);
-        return Optional.of(new UserDTO(savedUser));
+        return Optional.of(userRepository.save(user));
+    }
+
+    public Optional<UserDTO> createRegularUser(String firstname, String lastname, String email, String password) {
+        User userCreated = createInitialUser(
+                firstname,
+                lastname,
+                email,
+                password
+        ).orElseThrow(() -> new RuntimeException("Impossible de créer l'utilisateur."));
+        return Optional.of(new UserDTO(userCreated));
+    }
+
+    public Optional<UserDTO> createAdminUser(String firstname, String lastname, String email, String rawPassword) {
+        User userCreated = createInitialUser(
+                firstname,
+                lastname,
+                email,
+                rawPassword
+        ).orElseThrow(() -> new RuntimeException("Impossible de créer l'utilisateur admin."));
+        userCreated.setAdmin(true);
+
+        return Optional.of(new UserDTO(userCreated));
     }
 
     // Connect a user to the application by checking if the email and password are correct
@@ -224,7 +248,9 @@ public class UserService {
     }
 
     private boolean isValidMail(String email) {
-        if (email == null || email.isBlank()) {return false;}
+        if (email == null || email.isBlank()) {
+            return false;
+        }
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         return email.matches(emailRegex);
     }
