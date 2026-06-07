@@ -78,9 +78,13 @@ public class UserApiController {
             ).orElseThrow(() -> new RuntimeException("Impossible de créer l'utilisateur."));
 
             return ResponseEntity.ok(createdUser);
+            } catch (UserService.EmailAlreadyUsedException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    new ApiResponse(e.getMessage(), HttpStatus.CONFLICT.value())
+            );
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ApiResponse(e.getMessage())
+                    new ApiResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value())
             );
         }
     }

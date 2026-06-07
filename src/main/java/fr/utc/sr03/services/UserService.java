@@ -66,7 +66,7 @@ public class UserService {
     }
 
     public Optional<User> getUserByMail(String emailAddress) {
-        return userRepository.findByMail(emailAddress);
+        return userRepository.findByMail(emailAddress.toLowerCase());
     }
 
     public List<User> getAllUsers() {
@@ -98,13 +98,12 @@ public class UserService {
     ) {
         //  If the email is present, find by email first
         if (email != null && !email.isBlank()) {
-            return userRepository.findByMail(email)
+            return userRepository.findByMail(email.toLowerCase())
                     .stream() // Iterate over each element
                     .filter(u -> filterAdmin(u, admin)) // Filter to keep relevant element only
                     .filter(u -> filterActivated(u, activated))
                     .toList();
         }
-
         List<User> baseUsers;
 
         if (firstname != null && !firstname.isBlank()
@@ -160,8 +159,9 @@ public class UserService {
     // to activate the user). In a real production system, we would have created the user with activated = false.
     public Optional<UserDTO> createRegularUser(String firstname, String lastname, String email, String password) {
         // Verify email uniqueness
+        email = email.toLowerCase();
         if (userRepository.findByMail(email).isPresent()) {
-            return Optional.empty();
+            throw new EmailAlreadyUsedException("Email déjà utilisé, veuillez saisir un autre email.");
         }
 
         // Verify password security
@@ -193,6 +193,12 @@ public class UserService {
 
     public static class InvalidPasswordException extends RuntimeException {
         public InvalidPasswordException(String message) {
+            super(message);
+        }
+    }
+
+    public static class EmailAlreadyUsedException extends RuntimeException {
+        public EmailAlreadyUsedException(String message) {
             super(message);
         }
     }
