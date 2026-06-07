@@ -13,8 +13,8 @@ public class MessageService {
     @Resource
     private MessageRepository messageRepository;
 
-    public void createMessage(Message message) {
-        messageRepository.save(message);
+    public Message createMessage(Message message) {
+        return messageRepository.save(message);
     }
 
     public List<Message> getMessagesByChannelId(Integer channelId) {

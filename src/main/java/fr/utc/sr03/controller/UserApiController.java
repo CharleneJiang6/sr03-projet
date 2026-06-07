@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -78,7 +79,7 @@ public class UserApiController {
             ).orElseThrow(() -> new RuntimeException("Impossible de créer l'utilisateur."));
 
             return ResponseEntity.ok(createdUser);
-            } catch (UserService.EmailAlreadyUsedException e) {
+        } catch (UserService.EmailAlreadyUsedException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     new ApiResponse(e.getMessage(), HttpStatus.CONFLICT.value())
             );
@@ -89,7 +90,22 @@ public class UserApiController {
         }
     }
 
-    // NOTE: no endpoint for creating admin user yet as it is managed by WebController as for now
+    @PostMapping("/admin")
+    public ResponseEntity<?> createAdminUser(@RequestBody CreateUserRequest body) {
+        Optional<UserDTO> createdAdmin = userService.createAdminUser(
+                body.firstname(),
+                body.lastname(),
+                body.email(),
+                body.password()
+        );
+        if (createdAdmin.isPresent()) {
+            return ResponseEntity.ok(createdAdmin.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new ApiResponse("Impossible de créer l'utilisateur admin.", HttpStatus.INTERNAL_SERVER_ERROR.value())
+            );
+        }
+    }
 
     // Update user info: all field is taken into account, except the password
     @PatchMapping("/{id}")

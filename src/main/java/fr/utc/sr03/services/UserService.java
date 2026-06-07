@@ -195,6 +195,7 @@ public class UserService {
                 rawPassword
         ).orElseThrow(() -> new RuntimeException("Impossible de créer l'utilisateur admin."));
         userCreated.setAdmin(true);
+        userCreated = userRepository.save(userCreated);
 
         return Optional.of(new UserDTO(userCreated));
     }
