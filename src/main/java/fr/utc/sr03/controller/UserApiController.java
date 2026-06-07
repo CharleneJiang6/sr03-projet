@@ -58,11 +58,7 @@ public class UserApiController {
     public ResponseEntity<?> login(@RequestBody LoginRequest body) {
         var result = userService.loginUser(body.email(), body.password());
         if (result.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(
-                            "Connexion réussie.",
-                            200
-                    )
-            );
+            return ResponseEntity.ok(result);
         }
         return ResponseEntity.
                 status(HttpStatus.UNAUTHORIZED).
