@@ -28,8 +28,7 @@ public class WSController {
                         MessageService messageService,
                         UserService userService,
                         ChannelService channelService,
-                        ParticipationService participationService)
-    {
+                        ParticipationService participationService) {
         this.messagingTemplate = messagingTemplate;
         this.messageService = messageService;
         this.userService = userService;
@@ -47,6 +46,12 @@ public class WSController {
             return;
         }
 
+        // Forbid sending message to expired channels
+        if (channel.getExpirationDate() != null
+                && channel.getExpirationDate().isBefore(LocalDateTime.now())) {
+            return;
+        }
+
         if (!participationService.isUserInChannel(sender.getId(), channel.getId())) {
             return;
         }
@@ -58,15 +63,14 @@ public class WSController {
                 channel
         );
 
-        messageService.createMessage(message);
-
+        Message saved = messageService.createMessage(message);
         ChatMessageResponse response = new ChatMessageResponse(
-                message.getId(),
+                saved.getId(),
                 channel.getId(),
                 sender.getId(),
                 sender.getFirstname() + " " + sender.getLastname(),
-                message.getContent(),
-                message.getCreationDate()
+                saved.getContent(),
+                saved.getCreationDate()
         );
 
         messagingTemplate.convertAndSend(
