@@ -1,3 +1,9 @@
+drop table user;
+drop table channel;
+drop table participation;
+drop table message;
+drop table invitation;
+
 CREATE TABLE IF NOT EXISTS user
 (
     id        INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,5 +59,3 @@ CREATE TABLE IF NOT EXISTS invitation
     FOREIGN KEY (receiver_id) REFERENCES user(id),
     FOREIGN KEY (channel_id) REFERENCES channel(id)
 );
-
-Drop Table channel;
