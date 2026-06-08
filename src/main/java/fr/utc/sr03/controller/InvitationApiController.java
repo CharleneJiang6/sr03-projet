@@ -1,8 +1,10 @@
 package fr.utc.sr03.controller;
 
+import fr.utc.sr03.model.ApiResponse;
 import fr.utc.sr03.model.Invitation;
 import fr.utc.sr03.services.InvitationService;
 import jakarta.annotation.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,13 +40,17 @@ public class InvitationApiController {
         Integer receiverId = body.get("receiverId");
         Integer channelId = body.get("channelId");
 
-        Invitation invitation = invitationService.createInvitation(senderId, receiverId, channelId);
-
-        if (invitation == null) {
-            return ResponseEntity.badRequest().body("Utilisateur ou channel introuvable.");
+        try {
+            Invitation invitation = invitationService.createInvitation(senderId, receiverId, channelId);
+            return ResponseEntity.ok(invitation);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    new ApiResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value())
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
+                    body("Une erreur est survenue lors de la création de l'invitation.");
         }
-
-        return ResponseEntity.ok(invitation);
     }
 
     // Invite a user to a channel by its email
@@ -54,13 +60,19 @@ public class InvitationApiController {
         String receiverEmail = body.get("receiverMail");
         String channelId = body.get("channelId");
 
-        Invitation invitation = invitationService.inviteUserByEmail(senderId, receiverEmail, channelId);
-
-        if (invitation == null) {
-            return ResponseEntity.badRequest().body("Utilisateur ou channel introuvable.");
+        try {
+            Invitation invitation = invitationService.inviteUserByEmail(senderId, receiverEmail, channelId);
+            return ResponseEntity.ok(invitation);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    new ApiResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value())
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
+                    body(new ApiResponse("Une erreur est survenue lors de la création de l'invitation.",
+                            HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
-
-        return ResponseEntity.ok(invitation);
     }
 
     @PatchMapping("/{id}/accept")

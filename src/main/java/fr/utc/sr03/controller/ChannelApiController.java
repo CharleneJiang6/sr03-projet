@@ -2,6 +2,7 @@ package fr.utc.sr03.controller;
 
 import fr.utc.sr03.model.ApiResponse;
 import fr.utc.sr03.model.Channel;
+import fr.utc.sr03.model.dto.ChannelResponseDTO;
 import fr.utc.sr03.services.ChannelService;
 import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
@@ -20,21 +21,25 @@ public class ChannelApiController {
     private ChannelService channelService;
 
     @GetMapping
-    public List<Channel> getChannels(
+    public List<ChannelResponseDTO> getChannels(
             @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status
     ) {
-        return channelService.getChannels(userId, type, status);
+        return channelService.getChannelDtos(userId, type, status);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Channel> getChannelById(@PathVariable int id) {
+    public ResponseEntity<ChannelResponseDTO> getChannelById(
+            @PathVariable int id,
+            @RequestParam(required = false) Integer userId // used to filter the pending invitations sent out by him
+    ) {
         Channel channel = channelService.getChannelById(id);
         if (channel == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(channel);
+        ChannelResponseDTO dto = channelService.toDto(channel, userId);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping

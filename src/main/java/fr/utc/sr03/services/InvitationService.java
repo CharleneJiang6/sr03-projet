@@ -1,6 +1,7 @@
 package fr.utc.sr03.services;
 
 import fr.utc.sr03.model.*;
+import fr.utc.sr03.model.enums.ChannelType;
 import fr.utc.sr03.model.enums.InvitationStatus;
 import fr.utc.sr03.repository.InvitationRepository;
 import fr.utc.sr03.model.dto.ParticipationDTO;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InvitationService {
@@ -51,7 +53,35 @@ public class InvitationService {
         Channel channel = channelService.getChannelById(channelId);
 
         if (sender == null || receiver == null || channel == null) {
-            return null;
+            throw new IllegalArgumentException("Les paramètres de l'invitation ne doivent pas être nuls.");
+        }
+
+        List<Invitation> existingInvitation = invitationRepository.findBySenderIdAndReceiverIdAndChannelId(
+                senderId, receiverId, channelId);
+        if (!existingInvitation.isEmpty() && existingInvitation.getFirst().getStatus() == InvitationStatus.PENDING) {
+            throw new IllegalArgumentException("Une invitation en attente existe déjà entre ces utilisateurs pour ce salon.");
+        }
+
+        // Specific rules for Private chats (2 members only)
+        if (ChannelType.PRIVATE.equals(channel.getType())) {
+
+            // Verify the number of existing participations in the channel
+            List<Participation> participations = participationService.findChannelParticipations(channelId);
+            if (participations.size() >= 2) {
+                throw new IllegalArgumentException("Les salons privés ne peuvent pas avoir plus de 2 membres. " +
+                        "Veuillez créer un salon de type 'Groupe' pour inviter plus de personnes.");
+            }
+
+            // Verify the invitations already sent by this sender for this channel
+            List<Invitation> sentInvitations = getSentInvitations(senderId);
+            boolean hasPendingForThisChannel = sentInvitations.stream()
+                    .anyMatch(inv -> inv.getChannel().getId().equals(channelId)
+                            && inv.getStatus() == InvitationStatus.PENDING);
+
+            if (hasPendingForThisChannel) {
+                throw new IllegalArgumentException("Vous avez déjà une invitation envoyé en attente pour ce salon. " +
+                        "Veuillez l'annuler avant d'envoyer une autre.");
+            }
         }
 
         Invitation invitation = new Invitation();
@@ -112,15 +142,30 @@ public class InvitationService {
     }
 
     public Invitation inviteUserByEmail(String senderId, String receiverEmail, String channelId) {
-        User sender = userService.getUserById(Integer.parseInt(senderId));
-        User receiver = userService.getUserByMail(receiverEmail).orElse(null);
-        Channel channel = channelService.getChannelById(Integer.parseInt(channelId));
-
-        if (sender == null || receiver == null || channel == null) {
-            return null;
+        Integer sId;
+        Integer cId;
+        try {
+            sId = Integer.parseInt(senderId);
+            cId = Integer.parseInt(channelId);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Les identifiants envoyés sont invalides.");
         }
 
-        Invitation invitation = new Invitation(sender, receiver, channel, InvitationStatus.PENDING, LocalDateTime.now());
-        return invitationRepository.save(invitation);
+        User sender = userService.getUserById(sId);
+        if (sender == null) {
+            throw new IllegalArgumentException("L'utilisateur émetteur est introuvable.");
+        }
+
+        User receiver = userService.getUserByMail(receiverEmail).orElse(null);
+        if (receiver == null) {
+            throw new IllegalArgumentException("Aucun utilisateur trouvé avec l'adresse e-mail : " + receiverEmail);
+        }
+
+        Channel channel = channelService.getChannelById(cId);
+        if (channel == null) {
+            throw new IllegalArgumentException("Le salon cible est introuvable.");
+        }
+
+        return createInvitation(sender.getId(), receiver.getId(), channel.getId());
     }
 }

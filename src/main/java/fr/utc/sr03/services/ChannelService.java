@@ -3,12 +3,16 @@ package fr.utc.sr03.services;
 import fr.utc.sr03.model.Channel;
 import fr.utc.sr03.model.Participation;
 import fr.utc.sr03.model.User;
+import fr.utc.sr03.model.dto.ChannelResponseDTO;
 import fr.utc.sr03.model.enums.ChannelType;
+import fr.utc.sr03.model.enums.InvitationStatus;
 import fr.utc.sr03.repository.ChannelRepository;
+import fr.utc.sr03.repository.InvitationRepository;
 import fr.utc.sr03.repository.ParticipationRepository;
 import fr.utc.sr03.repository.UserRepository;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -29,12 +33,15 @@ public class ChannelService {
     @Resource
     private ParticipationRepository participationRepository;
 
+    @Resource
+    private InvitationRepository invitationRepository;
+
     public Channel saveChannel(Channel channel) {
         if (channel.getCreationDate() == null || channel.getExpirationDate() == null) {
             throw new IllegalArgumentException("Les dates de création et d'expiration sont requises");
         }
 
-        if(channel.getCreationDate().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+        if (channel.getCreationDate().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
             throw new IllegalArgumentException("La date de création ne peut pas être dans le passé");
         }
 
@@ -195,5 +202,38 @@ public class ChannelService {
 
         channelRepository.deleteById(channelId);
         return true;
+    }
+
+    public List<ChannelResponseDTO> getChannelDtos(Integer userId, String type, String status) {
+        List<Channel> channels = getChannels(userId, type, status);
+        return channels.stream()
+                .map(channel -> toDto(channel, userId))
+                .toList();
+    }
+
+    public ChannelResponseDTO toDto(Channel channel, Integer currentUserId) {
+        ChannelResponseDTO dto = new ChannelResponseDTO();
+        dto.setId(channel.getId());
+        dto.setTitle(channel.getTitle());
+        dto.setDescription(channel.getDescription());
+        dto.setType(channel.getType().name());
+        dto.setCreationDate(channel.getCreationDate());
+        dto.setExpirationDate(channel.getExpirationDate());
+        dto.setOwnerId(channel.getOwner() != null ? channel.getOwner().getId() : null);
+
+        int membersCount = participationRepository.findByChannelId(channel.getId()).size();
+        dto.setMembersCount(membersCount);
+
+        // Pending Invitations for this user
+        int pendingInvitationsCount = 0;
+        if (currentUserId != null) {
+            pendingInvitationsCount =
+                    invitationRepository.countByChannelIdAndSenderIdAndStatus(
+                            channel.getId(), currentUserId, InvitationStatus.PENDING
+                    );
+        }
+        dto.setPendingInvitationsCount(pendingInvitationsCount);
+
+        return dto;
     }
 }
