@@ -34,8 +34,13 @@ public class ChannelService {
             throw new IllegalArgumentException("Les dates de création et d'expiration sont requises");
         }
 
-        if (!channel.getExpirationDate().isAfter(channel.getCreationDate())) {
-            throw new IllegalArgumentException("La date de fin doit être postérieure à la date de début");
+        if(channel.getCreationDate().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+            throw new IllegalArgumentException("La date de création ne peut pas être dans le passé");
+        }
+
+        // Expiration must be equal or after creation (not before)
+        if (channel.getExpirationDate().isBefore(channel.getCreationDate())) {
+            throw new IllegalArgumentException("La date de fin doit être postérieure ou égale à la date de début");
         }
 
         if (channel.getTitle() == null || channel.getTitle().isBlank()) {

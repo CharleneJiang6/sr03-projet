@@ -1,8 +1,10 @@
 package fr.utc.sr03.controller;
 
+import fr.utc.sr03.model.ApiResponse;
 import fr.utc.sr03.model.Channel;
 import fr.utc.sr03.services.ChannelService;
 import jakarta.annotation.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +38,15 @@ public class ChannelApiController {
     }
 
     @PostMapping
-    public ResponseEntity<Channel> createChannel(@RequestBody Channel channel) {
-        Channel createdChannel = channelService.saveChannel(channel);
-        return ResponseEntity.ok(createdChannel);
+    public ResponseEntity<?> createChannel(@RequestBody Channel channel) {
+        try {
+            Channel createdChannel = channelService.saveChannel(channel);
+            return ResponseEntity.ok(createdChannel);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    new ApiResponse(e.getMessage())
+            );
+        }
     }
 
     @PatchMapping("/{id}")
