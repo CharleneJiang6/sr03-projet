@@ -1,9 +1,15 @@
-# Projet Chat SR03
+# Application de chat en temps réel
 
 ## Présentation du projet
 
-Ce projet a été réalisé dans le cadre de l’UV SR03.
-L’objectif est de développer une application de discussion multi-utilisateurs permettant de gérer des utilisateurs, des salons de discussion, des invitations et des échanges de messages.
+Ce projet a été réalisé dans le cadre de l’UV SR03 (Architecture des applications internet).
+L’objectif est de développer une application de discussion en temps réel multi-utilisateurs.
+Elle permet entre autres de :
+
+- planifier un salon de discussion à une date donnée ;
+- gérer les salons de discussion (gestion des participants, suppression du salon, etc.) ;
+- gérer les invitations (accepter ou refuser) ;
+- chatter en temps réel dans les salons de discussion.
 
 Le projet est composé de deux parties :
 
@@ -15,12 +21,7 @@ Dépôts Git :
 * Backend : https://github.com/CharleneJiang6/sr03-projet
 * Frontend : https://github.com/CharleneJiang6/sr03-frontend
 
-## Membres du groupe
-
-Le projet a été réalisé par :
-
-* Sarra Boubahri
-* Charlène Jiang
+---
 
 ## Technologies utilisées
 
@@ -32,7 +33,6 @@ Le backend repose sur les technologies suivantes :
 * Spring Boot
 * Spring MVC
 * Spring Data JPA
-* Thymeleaf
 * WebSocket / STOMP
 * SQLite
 * Maven
@@ -47,6 +47,7 @@ WebSocket/STOMP est utilisé pour préparer la communication temps réel entre l
 
 Le frontend repose sur les technologies suivantes :
 
+* Thymeleaf (pour la partie admin)
 * React
 * Vite
 * JavaScript
@@ -55,6 +56,8 @@ Le frontend repose sur les technologies suivantes :
 
 React est utilisé pour construire l’interface utilisateur côté client.
 Vite permet de lancer rapidement le projet frontend en environnement de développement.
+
+---
 
 ## Architecture du projet
 
@@ -69,37 +72,42 @@ Controller → Service → Repository → Database
 L’organisation principale du backend est la suivante :
 
 ```text
-src/main/java/fr.utc.sr03
-├── controller
+src/main/java/fr.utc.sr03/
+├── controller/
 │   ├── ChannelApiController
 │   ├── InvitationApiController
+│   ├── MessageApiController
+│   ├── ParticipationApiController
 │   ├── UserApiController
 │   └── WebController
-├── model
+├── init/
+│   └──  DataInitializer
+├── model/
+│   ├── dto/
+│   ├── enums/
+│   ├── ApiResponse
 │   ├── Channel
 │   ├── Invitation
 │   ├── Message
 │   ├── Participation
-│   ├── User
-│   └── UserDTO
-├── repository
+│   └── User
+├── repository/
 │   ├── ChannelRepository
 │   ├── InvitationRepository
 │   ├── MessageRepository
 │   ├── ParticipationRepository
 │   └── UserRepository
-├── services
+├── services/
 │   ├── ChannelService
 │   ├── InvitationService
 │   ├── MessageService
 │   ├── ParticipationService
 │   ├── PasswordService
 │   └── UserService
-├── websocket
-│   ├── dto
+├── websocket/
+│   ├── dto/
 │   ├── MessageSocket
 │   ├── WebSocketConfig
-│   ├── WebSocketHandler
 │   └── WSController
 └── Application
 ```
@@ -111,21 +119,34 @@ Les modèles représentent les entités manipulées par l’application.
 
 ### Frontend
 
-Le frontend est organisé dans un dépôt séparé :
+Le frontend est organisé dans un [dépôt séparé](https://github.com/CharleneJiang6/sr03-frontend) :
 
 ```text
-sr03-frontend
-├── public
-├── src
-│   ├── assets
+sr03-frontend/
+├── public/
+├── src/
+│   ├── assets/
 │   ├── App.css
 │   ├── App.jsx
 │   ├── ChatPage.jsx
+│   ├── Constants.jsx
+│   ├── ForgotPasswordPage.jsx
+│   ├── HomePage.jsx
 │   ├── index.css
-│   └── main.jsx
+│   ├── LoginPage.jsx
+│   ├── main.jsx
+│   ├── ManageMembersModal.jsx
+│   ├── MyAllChannelsPage.jsx
+│   ├── MyInvitationsPage.jsx
+│   ├── PlanChannelPage.jsx
+│   └── SignupPage.jsx
+├── index.html
 ├── package.json
+├── package-lock.json
 └── vite.config.js
 ```
+
+---
 
 ## Fonctionnalités réalisées
 
@@ -144,10 +165,9 @@ Elle permet notamment :
 * la suppression d’un utilisateur ;
 * l’affichage des utilisateurs désactivés ;
 
-
 L’interface administrateur est réalisée avec Thymeleaf.
 
-### API utilisateurs
+### API utilisateurs `UserApiController`
 
 L’API utilisateur permet notamment :
 
@@ -162,7 +182,7 @@ L’API utilisateur permet notamment :
 
 Des vérifications ont été ajoutées, notamment sur l’unicité de l’adresse mail et la sécurité du mot de passe.
 
-### API salons
+### API salons `ChannelApiController`
 
 L’API des salons permet notamment :
 
@@ -173,7 +193,14 @@ L’API des salons permet notamment :
 * de modifier un salon ;
 * de supprimer un salon.
 
-### API invitations
+### API participations `ParticipationApiController`
+L’API des participations permet notamment :
+* d'ajouter une participation (par identifiant ou par email) ;
+* de récupérer les participations d’un utilisateur ;
+* de récupérer les participations d’un salon ;
+* de supprimer une participation.
+
+### API invitations `InvitationApiController`
 
 L’API des invitations permet notamment :
 
@@ -188,7 +215,7 @@ Lorsqu’une invitation est acceptée, l’objectif est de permettre à l’util
 
 ### WebSocket / STOMP
 
-Une première implémentation WebSocket/STOMP a été mise en place afin de gérer la communication temps réel.
+Une implémentation WebSocket/STOMP a été mise en place afin de gérer la communication temps réel.
 
 La structure WebSocket contient notamment :
 
@@ -197,17 +224,7 @@ La structure WebSocket contient notamment :
 * un modèle de message socket ;
 * des DTO liés aux messages.
 
-Cette partie est encore en cours de stabilisation et de test.
-
-## Fonctionnalités en cours ou incomplètes
-
-Certaines parties du projet sont encore en cours de finalisation :
-
-* la partie utilisateur côté frontend n’est pas encore totalement complète ;
-* l’interface utilisateur React est encore en cours d’intégration avec le backend ;
-* le test complet de WebSocket avec Postman reste à finaliser ;
-* certaines fonctionnalités liées aux participations doivent encore être stabilisées ;
-* la logique utilisateur finale reste moins complète que la partie administrateur.
+---
 
 ## Base de données
 
@@ -215,11 +232,13 @@ Le projet utilise une base de données SQLite.
 
 La base de données sert à stocker les principales entités du projet :
 
-* utilisateurs ;
-* salons ;
-* invitations ;
-* messages ;
-* participations.
+* utilisateurs `User` ;
+* salons `Channel` ;
+* participations `Participation`,
+* invitations `Invitation` ;
+* messages `Message`.
+
+---
 
 ## Lancement du projet
 
@@ -228,7 +247,7 @@ La base de données sert à stocker les principales entités du projet :
 Dans le dossier du backend :
 
 ```bash
-mvn compile
+mvn clean compile
 ```
 
 Puis lancer l’application depuis l’IDE avec le bouton Run sur la classe principale :
@@ -254,10 +273,59 @@ Le frontend est ensuite accessible en local, généralement à l’adresse suiva
 http://localhost:5173
 ```
 
+---
+
+## Environnement de test et jeux de données
+
+Pour garantir un environnement de test identique pour tous (étudiants, enseignant),  
+l’application fournit un profil Spring `testdata` qui :
+
+- exécute le script `schema.sql` pour créer les tables,
+- peuple la base avec des données factices cohérentes, créées via les services métiers  
+  (création d’utilisateurs, salons, participations, messages, invitations) : `spring.jpa.hibernate.ddl-auto=update`.
+
+### Lancer l’application avec les données de test
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=testdata
+```
+
+### Utilisateurs Réguliers créés
+
+| Email           | Mot de passe |
+| --------------- | ------------ |
+| alpha@mail.fr   | Alpha*2026   |
+| beta@mail.fr    | Beta*2026    |
+| gamma@mail.fr   | Gamma*2026   |
+| delta@mail.fr   | Delta*2026   |
+| epsilon@mail.fr | Epsilon*2026 |
+| zeta@mail.fr    | Zeta*2026    |
+
+### Utilisateurs Admin créés
+| Email           | Mot de passe |
+| --------------- | ------------ |
+| jupiter@mail.fr | Jupiter*2026 |
+| saturne@mail.fr | Saturne*2026 |
+| neptune@mail.fr | Neptune*2026 |
+
+
+### Salons et messages
+
+Le profil `testdata` crée également plusieurs salons, par exemple :
+
+`All hands Alpha` (type **GROUP**), owner = **Alpha Grec**, incluant tous les utilisateurs créés.
+Des messages d’exemple sont créés sur ces salons afin de tester facilement la partie WebSocket / chat temps réel avec plusieurs onglets / clients.
+
+---
+
 ## Organisation du travail
 
-Au début du projet, l’organisation du groupe se faisait principalement par WhatsApp.
-Chaque membre informait l’autre de l’avancement de ses tâches, des problèmes rencontrés et des éléments ajoutés au projet.
+Au début du projet, l’organisation du groupe se faisait principalement par WhatsApp et durant les séances de TD.
+Chaque membre informait l’autre de l’avancement de ses tâches, des problèmes rencontrés et des éléments ajoutés au
+projet.
+
+Nous avons entre autres défini le modèle des données ensemble, ainsi que les routes pour les différentes API/Contrôleurs.
+Également, les commits de l'autre membre sont systématiquement revus ou fusionnés avec leur branche courante avant de progresser.
 
 À partir du 15 mai, l’organisation a été davantage structurée grâce à un backlog partagé sous forme de fichier Excel.
 Ce backlog permettait de suivre :
@@ -270,58 +338,113 @@ Ce backlog permettait de suivre :
 
 Les commits Git ont également permis de suivre l’évolution du projet.
 
+## Membres du groupe
 
-## Répartition du travail
+Le projet a été réalisé par :
 
-### Sarra Boubahri
+* BOUBAHRI Sarra
+* JIANG Charlène
 
-Sarra a principalement travaillé sur :
+## Contributions des membres
 
-* la mise en place de plusieurs entités Java ;
-* la création de repositories ;
-* l’API des channels ;
-* l’API des invitations ;
-* les tests des endpoints Channel et Invitation ;
-* la mise en place de WebSocket/STOMP ;
-* l’amélioration de l’interface administrateur Thymeleaf ;
-* la page de confirmation de création utilisateur ;
-* la correction de bugs liés à la suppression utilisateur ;
-* la création de certains composants React ;
-* la définition d’une charte graphique ;
-* la préparation du README et du rapport.
+### BOUBAHRI Sarra
 
-### Charlène Jiang
+#### Backend
+- Création initiale de la plupart des repositories et services.
+- Implémentation et tests de l’API **Channel**.
+- Implémentation et tests de l’API **Invitation**.
+- Implémentation de l’API **Message**.
+- Implémentation du **WebController** pour la partie Admin.
+- Mise en place du **WebSocket/STOMP** pour le chat en temps réel.
 
-Charlène a principalement travaillé sur :
+#### Partie administrateur (Thymeleaf)
+- Amélioration de l’interface administrateur basée sur Thymeleaf.
+- Implémentation des fonctionnalités suivantes :
+  - Page d'accueil.
+  - Affichage de la liste des utilisateurs.
+  - Création d’un utilisateur.
+  - Désactivation d’un utilisateur.
+  - Réactivation d’un utilisateur.
+  - Suppression d’un utilisateur.
+  - Affichage des utilisateurs désactivés.
 
-* la structure initiale du projet ;
-* la base de données ;
-* certains modèles et contrôleurs ;
-* le workflow de connexion ;
-* la sécurité de certains endpoints utilisateur ;
-* les tests de l’API utilisateur ;
-* la mise en place de composants React ;
-* la navigation frontend ;
-* la planification de discussion ;
-* l’intégration progressive du frontend avec le backend.
+#### Frontend (React)
+- Création de composants React :
+  - page de chat en temps réel,
+  - page de gestion des invitations.
+- Définition de la charte graphique globale de l’application (palette, typographie, style des composants).
+- Structuration initiale du fichier **README**.
 
-## Suivi Git
+---
 
-Le projet a été suivi avec Git et GitHub.
-Les commits permettent de visualiser l’évolution du projet.
+### JIANG Charlène
 
-## Limites du projet
+#### Backend
+- Implémentation et tests de l’API **User**.
+- Implémentation et tests de l’API **Participation**.
+- Ajout de vérifications de sécurité dans tous les services.
+- Création de plusieurs DTO pour le transfert d’objets et la gestion des requêtes entrantes :
+`UserDTO`, `ChannelResponseDTO`, `ParticipationDTO`, `CreateUserRequest`, `LoginRequest`, `PasswordUpdateRequest`, `UserUpdateRequest`
+- Création de `PasswordService` pour centraliser :
+    - le chiffrement / vérification des mots de passe,
+    - l’évaluation de la robustesse des mots de passe.
+- Mise en place d’un programme d’initialisation et de peuplement de la base de données pour faciliter les tests (`DataInitializer`).
 
-Même si plusieurs fonctionnalités backend et administrateur sont fonctionnelles, le projet présente encore certaines limites :
 
-* l’interface utilisateur finale n’est pas totalement complète ;
-* certaines interactions côté utilisateur doivent encore être testées ;
-* l’intégration frontend/backend reste partielle ;
-* la partie WebSocket nécessite encore des tests plus poussés ;
-* la gestion complète des participations doit être finalisée.
+#### Frontend (React)
+- Mise en place de la structure de base du projet frontend (squelette des pages et des fonctionnalités principales).
+- Intégration du backend dans le frontend pour les fonctionnalités métier.
+- Implémentation du flux d’authentification :
+    - Connexion / déconnexion.
+    - Mot de passe oublié.
+    - Création d’un nouveau compte.
+- Implémentation de la page d’accueil.
+- Implémentation du formulaire de planification de **channel** (création de salon).
+- Implémentation de la page “Mes salons” (salons créés / rejoints) avec :
+    - filtres par rôle (créateur / participant),
+    - filtres par statut (actif / expiré),
+    - filtres par type (groupe / privé),
+    - tri par date de création ou nom du channel.
+- Implémentation de l’invitation de nouveaux membres dans un salon, avec règles métier :
+    - salon privé limité à 2 membres,
+    - impossibilité d’inviter si le salon est expiré.
+- Implémentation de la gestion des membres d’un channel pour le créateur :
+    - visualisation des membres,
+    - suppression d’un membre avec confirmation,
+    - blocage de la gestion des participants par les utilisateurs non créateurs (lecture seule).
 
+Et voici le backlog de suivi pour la deuxième partie du projet :
+![Backlog](backlog.png)
+
+---
+
+## Pistes d’amélioration
+
+### Sécurité et authentification
+- Envoyer un email de confirmation avec **token** lors de la création d’un nouveau compte utilisateur.
+- Empêcher un utilisateur de se connecter simultanément plusieurs fois (gestion de sessions actives).
+- Pour “mot de passe oublié”, envoyer un email contenant un **token sécurisé** permettant de réinitialiser le mot de passe.
+- Protection contre les tentatives de connexion en **brute force** :  
+  Pour simplifier, aucune protection n’est implémentée dans ce projet.  
+  En production, on utiliserait un système de throttling côté backend  
+  (ex : blocage temporaire du compte / de l’IP après *N* tentatives ratées).
+
+### Expérience utilisateur
+- Ajouter une page de gestion de compte personnel (mise à jour des informations utilisateur, changement de mot de passe, etc.).
+- Classer les salons selon la **dernière activité** (dernier message) au lieu d’une vue statique.
+- Apporter divers ajustements UI/UX :
+  - ajout d’un logo,
+  - amélioration de la barre de navigation,
+  - utilisation d’icônes cohérentes dans toute l’application.
+
+### API et architecture backend
+- Nettoyer et homogénéiser le code backend :
+  - manipuler uniquement des **DTO** pour les requêtes entrantes (et non des `Map`),
+  - uniformiser la structure des réponses d’API (format d’erreur, messages, codes).
+
+---
 ## Conclusion
 
-Ce projet nous a permis de mettre en pratique plusieurs notions vues en SR03 : Spring Boot, MVC, REST, persistance avec JPA, interface Thymeleaf, API backend, communication avec un frontend React et mise en place d’une communication temps réel avec WebSocket/STOMP.
-
-
+Ce projet nous a permis de mettre en pratique plusieurs notions vues en SR03 : Spring Boot, MVC, REST, persistance avec
+JPA, interface Thymeleaf, API backend, communication avec un frontend React et mise en place d’une communication temps
+réel avec WebSocket/STOMP.
