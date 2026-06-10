@@ -52,6 +52,11 @@ public class WSController {
             return;
         }
 
+        // Forbid sending message to future channels
+        if (channel.getCreationDate().isAfter(LocalDateTime.now())) {
+            return;
+        }
+
         if (!participationService.isUserInChannel(sender.getId(), channel.getId())) {
             return;
         }
