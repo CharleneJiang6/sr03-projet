@@ -156,6 +156,7 @@ public class InvitationService {
             throw new IllegalArgumentException("L'utilisateur émetteur est introuvable.");
         }
 
+        receiverEmail = receiverEmail.toLowerCase();
         User receiver = userService.getUserByMail(receiverEmail).orElse(null);
         if (receiver == null) {
             throw new IllegalArgumentException("Aucun utilisateur trouvé avec l'adresse e-mail : " + receiverEmail);
@@ -164,6 +165,13 @@ public class InvitationService {
         Channel channel = channelService.getChannelById(cId);
         if (channel == null) {
             throw new IllegalArgumentException("Le salon cible est introuvable.");
+        }
+
+        Participation participationFound = participationService.findSpecificParticipation(
+                receiver.getId(), cId
+        );
+        if (participationFound != null) {
+            throw new IllegalArgumentException(receiverEmail + " est déjà membre du channel.");
         }
 
         return createInvitation(sender.getId(), receiver.getId(), channel.getId());
