@@ -57,6 +57,8 @@ Le frontend repose sur les technologies suivantes :
 React est utilisé pour construire l’interface utilisateur côté client.
 Vite permet de lancer rapidement le projet frontend en environnement de développement.
 
+De plus, la bibliothèque `lucid-react` est utilisé pour placer des icônes dans les boutons.
+
 ---
 
 ## Architecture du projet
