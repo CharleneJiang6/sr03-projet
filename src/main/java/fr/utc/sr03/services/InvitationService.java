@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InvitationService {
@@ -40,11 +39,11 @@ public class InvitationService {
     }
 
     public List<Invitation> getReceivedInvitations(Integer userId) {
-        return invitationRepository.findByReceiverId(userId);
+        return invitationRepository.findByReceiverIdOrderByCreationDateDesc(userId);
     }
 
     public List<Invitation> getSentInvitations(Integer userId) {
-        return invitationRepository.findBySenderId(userId);
+        return invitationRepository.findBySenderIdOrderByCreationDateDesc(userId);
     }
 
     public Invitation createInvitation(Integer senderId, Integer receiverId, Integer channelId) {

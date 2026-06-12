@@ -18,4 +18,9 @@ public interface InvitationRepository extends JpaRepository<Invitation, Integer>
     int countByChannelIdAndSenderIdAndStatus(Integer channelId, Integer senderId, InvitationStatus invitationStatus);
 
     List<Invitation> findBySenderIdAndReceiverIdAndChannelId(Integer senderId, Integer receiverId, Integer channelId);
+
+    List<Invitation> findByReceiverIdOrderByCreationDateDesc(Integer userId);
+
+    List<Invitation> findBySenderIdOrderByCreationDateDesc(Integer userId);
+
 }
