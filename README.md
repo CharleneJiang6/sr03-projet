@@ -433,11 +433,10 @@ Et voici le backlog de suivi pour la deuxième partie du projet :
 
 ### Expérience utilisateur
 - Ajouter une page de gestion de compte personnel (mise à jour des informations utilisateur, changement de mot de passe, etc.).
-- Classer les salons selon la **dernière activité** (dernier message) au lieu d’une vue statique.
-- Apporter divers ajustements UI/UX :
-  - ajout d’un logo,
-  - amélioration de la barre de navigation,
-  - utilisation d’icônes cohérentes dans toute l’application.
+- Classer les salons selon la dernière activité (dernier message) au lieu d’une vue statique.
+- Afficher le nombre d'utilisateurs connectés à un salon.
+- Rajouter un lien au formulaire de création de salon pour accéder à celui fraîchement créé.
+- Supporter l'envoi d'éléments de différentes natures dans un salon (audio, image, vidéo, fichiers).
 
 ### API et architecture backend
 - Nettoyer et homogénéiser le code backend :
