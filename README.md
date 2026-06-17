@@ -57,7 +57,101 @@ Le frontend repose sur les technologies suivantes :
 React est utilisé pour construire l’interface utilisateur côté client.
 Vite permet de lancer rapidement le projet frontend en environnement de développement.
 
-De plus, la bibliothèque `lucid-react` est utilisé pour placer des icônes dans les boutons.
+## Imports utilisés dans le projet
+
+### Frontend (React / Vite / WebSocket)
+
+- **`react`**  
+  Bibliothèque principale pour construire l’interface utilisateur côté frontend (composants, hooks, rendu), notamment : `useEffect`, `useState`, `useRef`.
+
+- **`lucid-react`** est utilisé pour placer des icônes dans les boutons.
+
+- **`@stomp/stompjs`**  
+  Client STOMP JavaScript pour se connecter au WebSocket Spring et gérer le chat en temps réel (subscribe/publish).
+
+- **`vite`**  
+  Outil de build et de développement frontend pour lancer l’app React rapidement avec hot-reload.
+
+- **`@vitejs/plugin-react`**  
+  Plugin Vite spécifique à React pour gérer JSX, Fast Refresh et l’intégration React dans Vite.
+
+
+### Persistence / JPA
+
+- **`jakarta.persistence`**  
+  Fournit les annotations JPA (`@Entity`, `@Id`, `@Column`, etc.) pour mapper les classes Java aux tables de la base de données.
+
+
+### Sécurité / Cryptage des mots de passe
+
+- **`at.favre.lib.crypto.bcrypt.BCrypt`**  
+  Bibliothèque utilisée pour hacher et vérifier les mots de passe avec l’algorithme BCrypt côté backend.
+
+
+### Injection de dépendances / Ressources
+
+- **`jakarta.annotation.Resource`**  
+  Annotation pour injecter les dépendances Spring (services, repositories) dans les classes (`@Resource`).
+
+
+### Logging
+
+- **`org.slf4j.Logger`**  
+  Interface de logging utilisée pour écrire des messages de log (info, erreur, debug) dans les classes backend.
+
+
+### Spring MVC : services, contrôleurs, réponses HTTP
+
+- **`org.springframework.stereotype.Service`**  
+  Annotation pour déclarer une classe de service Spring qui contient la logique métier.
+
+- **`org.springframework.stereotype.Controller`**  
+  Annotation pour déclarer un contrôleur MVC (Thymeleaf) qui retourne des vues côté serveur.
+
+- **`org.springframework.web.bind.annotation.*`**  
+  Ensemble d’annotations pour les contrôleurs REST (`@RestController`, `@GetMapping`, `@PostMapping`, `@RequestBody`, etc.).
+
+- **`org.springframework.http.HttpStatus`**  
+  Enum qui représente les codes HTTP (200, 400, 404, etc.) pour construire les réponses.
+
+- **`org.springframework.http.ResponseEntity`**  
+  Objet de réponse HTTP qui encapsule le corps, le statut et les headers de manière typée.
+
+- **`org.springframework.web.bind.annotation.CrossOrigin`**  
+  Annotation pour configurer CORS et autoriser les requêtes cross-origin depuis le frontend React.
+
+- **`org.springframework.ui.Model`**  
+  Objet Spring MVC pour passer des données du contrôleur vers la vue Thymeleaf.
+
+- **`jakarta.servlet.http.HttpSession`**  
+  Objet représentant la session HTTP pour stocker des informations côté serveur (par exemple l’utilisateur connecté).
+
+
+### Dates, heures et collections Java
+
+- **`java.time.LocalDateTime`**  
+  Représente une date et une heure sans fuseau horaire (par exemple pour la création et l’expiration des salons et des messages).
+
+- **`java.time.OffsetDateTime`**  
+  Représente une date et une heure avec un offset de fuseau horaire (utile pour exposer des dates en API avec décalage UTC).
+
+- **`java.time.ZoneOffset`**  
+  Représente le décalage par rapport à UTC pour convertir les dates `LocalDateTime` en `OffsetDateTime`.
+
+
+### WebSocket / STOMP (backend Spring)
+
+- **`org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker`**  
+  Annotation qui active la gestion des WebSocket avec STOMP dans l’application Spring.
+
+- **`org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer`**  
+  Interface à implémenter pour configurer le broker de messages STOMP (endpoints, destinations).
+
+- **`org.springframework.web.socket.config.annotation.StompEndpointRegistry`**  
+  Objet utilisé pour enregistrer les endpoints STOMP accessibles depuis le frontend (par exemple `/ws`).
+
+- **`org.springframework.messaging.simp.config.MessageBrokerRegistry`**  
+  Objet utilisé pour configurer le broker de messages (préfixes des destinations `app`, `topic`, etc.).
 
 ---
 
