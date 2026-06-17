@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion admin - SR03</title>
+
+    <style>
+        body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: linear-gradient(135deg, #fff7fb, #fde2ef); color: #2b2b2b; }
+        .container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 30px; }
+        .card { width: 100%; max-width: 460px; background: white; border-radius: 24px; padding: 42px; box-shadow: 0 10px 35px rgba(214,51,132,0.15); border: 1px solid #f7d8e8; }
+        h1 { margin-top: 0; text-align: center; font-size: 34px; }
+        .subtitle { text-align: center; color: #777; margin-bottom: 30px; }
+        label { font-weight: 600; }
+        input { width: 100%; padding: 14px; margin: 8px 0 20px; border: 1px solid #efd5e2; border-radius: 12px; }
+        .error { color: #dc3545; text-align: center; font-weight: 600; }
+        .btn { width: 100%; border: none; background: #d63384; color: white; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Connexion admin</h1>
+        <p class="subtitle">Accès réservé aux administrateurs</p>
+
+        <p class="error" th:if="${error}" th:text="${error}"></p>
+
+        <form th:action="@{/admin/login}" th:object="${user}" method="post">
+            <label>Email</label>
+            <input type="email" th:field="*{mail}" required>
+
+            <label>Mot de passe</label>
+            <input type="password" th:field="*{password}" required>
+
+            <button class="btn" type="submit">Se connecter</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

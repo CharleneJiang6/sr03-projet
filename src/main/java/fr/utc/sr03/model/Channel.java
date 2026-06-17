@@ -1,7 +1,9 @@
 package fr.utc.sr03.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import fr.utc.sr03.model.enums.ChannelType;
 
 @Entity
 @Table(name = "channel")
@@ -14,7 +16,7 @@ public class Channel {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = true)
     private String description;
 
     @Column(name = "creation_date", nullable = false)
@@ -23,14 +25,31 @@ public class Channel {
     @Column(name = "expiration_date", nullable = false)
     private LocalDateTime expirationDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private ChannelType type;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
     public Channel() {
     }
 
-    public Channel(String title, String description, LocalDateTime creationDate, LocalDateTime expirationDate) {
+    public Channel(
+            String title,
+            String description,
+            LocalDateTime creationDate,
+            LocalDateTime expirationDate,
+            ChannelType type,
+            User owner
+    ) {
         this.title = title;
         this.description = description;
         this.creationDate = creationDate;
         this.expirationDate = expirationDate;
+        this.type = type;
+        this.owner = owner;
     }
 
     public Integer getId() {
@@ -71,5 +90,17 @@ public class Channel {
 
     public void setExpirationDate(LocalDateTime expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public ChannelType getType() { return type; }
+
+    public void setType(ChannelType type) { this.type = type; }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 }

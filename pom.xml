@@ -5,13 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fr.utc.dsi.pia</groupId>
-    <artifactId>Devoir2</artifactId>
+    <artifactId>ChattingApp</artifactId>
     <version>1.0.0</version>
 
 
     <properties>
-        <maven.compiler.source>24</maven.compiler.source>
-        <maven.compiler.target>24</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -79,11 +80,15 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-
+        <!-- https://mvnrepository.com/artifact/at.favre.lib/bcrypt -->
+        <dependency>
+            <groupId>at.favre.lib</groupId>
+            <artifactId>bcrypt</artifactId>
+            <version>0.10.2</version>
+        </dependency>
 
 
     </dependencies>
-
 
 
 </project>

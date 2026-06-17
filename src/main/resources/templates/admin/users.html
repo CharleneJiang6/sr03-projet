@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Utilisateurs - SR03</title>
+
+    <style>
+        body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #fff7fb; color: #2b2b2b; }
+        .admin-navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 40px; background: #fff; box-shadow: 0 4px 20px rgba(214,51,132,0.10); }
+        .admin-logo { font-size: 22px; font-weight: 700; color: #d63384; }
+        .admin-links a { margin-left: 22px; text-decoration: none; color: #444; font-weight: 500; }
+        .admin-links a:hover, .admin-links .logout { color: #d63384; }
+        .container { max-width: 1250px; margin: 0 auto; padding: 50px 30px; }
+        .card { background: white; border-radius: 22px; padding: 32px; box-shadow: 0 8px 30px rgba(214,51,132,0.10); border: 1px solid #f7d8e8; }
+        h1 { margin-top: 0; font-size: 34px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+        th { color: #d63384; text-align: left; padding: 14px; border-bottom: 2px solid #f7d8e8; }
+        td { padding: 14px; border-bottom: 1px solid #f2edf0; }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 3px;
+            transition: 0.2s ease;
+        }
+
+        .green {
+            background: #198754;
+        }
+
+        .green:hover {
+            background: #157347;
+        }
+
+        .orange {
+            background: #fd7e14;
+        }
+
+        .orange:hover {
+            background: #e96b00;
+        }
+
+        .red {
+            background: #dc3545;
+        }
+
+        .red:hover {
+            background: #bb2d3b;
+        }
+
+        .status-active {
+            color: #198754;
+            font-weight: 700;
+        }
+
+        .status-disabled {
+            color: #fd7e14;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="admin/fragments/navbar :: navbar"></div>
+
+<div class="container">
+    <div class="card">
+        <h1>Liste des utilisateurs</h1>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Mail</th>
+                <th>Activé</th>
+                <th>Admin</th>
+                <th>Actions</th>
+            </tr>
+
+            <tr th:each="user : ${myusers}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.firstname}"></td>
+                <td th:text="${user.lastname}"></td>
+                <td th:text="${user.mail}"></td>
+
+                <td>
+                    <span th:if="${user.activated}" class="status-active">Oui</span>
+                    <span th:unless="${user.activated}" class="status-disabled">Non</span>
+                </td>
+
+                <td th:text="${user.admin}"></td>
+
+                <td>
+                    <a th:if="${user.activated}"
+                       class="btn orange"
+                       th:href="@{'/admin/users/disable/' + ${user.id}}">
+                        Désactiver
+                    </a>
+
+                    <a th:unless="${user.activated}"
+                       class="btn green"
+                       th:href="@{'/admin/users/enable/' + ${user.id}}">
+                        Activer
+                    </a>
+
+                    <a class="btn red"
+                       th:href="@{'/admin/users/delete/' + ${user.id}}"
+                       onclick="return confirm('Supprimer cet utilisateur ?')">
+                        Supprimer
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

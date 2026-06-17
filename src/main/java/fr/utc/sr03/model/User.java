@@ -2,9 +2,12 @@ package fr.utc.sr03.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "user")
-public class AppUser {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,25 +22,28 @@ public class AppUser {
     @Column(name = "mail", nullable = false)
     private String mail;
 
+    @JsonIgnore // Ignore the password field during JSON serialization for security concerns
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "activated", nullable = false)
+    @Column(name = "activated")
     private Boolean activated = true;
 
-    @Column(name = "admin", nullable = false)
+    @Column(name = "admin")
     private Boolean admin = false;
 
-    public AppUser() {
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Channel> channels; // A user is the creator of multiple channels
+
+
+    public User() {
     }
 
-    public AppUser(String firstname, String lastname, String mail, String password, Boolean activated, Boolean admin) {
+    public User(String firstname, String lastname, String mail, String password) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.mail = mail;
         this.password = password;
-        this.activated = activated;
-        this.admin = admin;
     }
 
     public Integer getId() {
