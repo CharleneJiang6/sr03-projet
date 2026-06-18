@@ -23,4 +23,5 @@ public interface InvitationRepository extends JpaRepository<Invitation, Integer>
 
     List<Invitation> findBySenderIdOrderByCreationDateDesc(Integer userId);
 
+    void deleteByChannelId(int channelId);
 }

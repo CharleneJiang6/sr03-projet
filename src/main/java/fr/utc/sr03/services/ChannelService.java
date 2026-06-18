@@ -12,6 +12,7 @@ import fr.utc.sr03.repository.ParticipationRepository;
 import fr.utc.sr03.repository.UserRepository;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
@@ -191,7 +192,7 @@ public class ChannelService {
                 .toList();
     }
 
-
+    @Transactional
     public boolean deleteChannelById(int channelId) {
         if (!channelRepository.existsById(channelId)) {
             return false;
@@ -199,7 +200,7 @@ public class ChannelService {
 
         // Remove all participations for this channel before deleting it
         participationRepository.deleteByChannelId(channelId);
-
+        invitationRepository.deleteByChannelId(channelId);
         channelRepository.deleteById(channelId);
         return true;
     }
