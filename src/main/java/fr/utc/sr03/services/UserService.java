@@ -208,7 +208,7 @@ public class UserService {
         }
 
         return userRepository.findByMail(email)
-                .filter(User::getActivated) // tu peux refuser les comptes désactivés par exemple
+                .filter(User::getActivated) // ignore the deactivated accounts
                 .filter(user -> passwordService.verifyPassword(password, user.getPassword()))
                 .map(user -> {
                     log.info("Utilisateur {} connecté avec succès", email);
