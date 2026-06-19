@@ -23,5 +23,5 @@ public interface ParticipationRepository extends JpaRepository<Participation, In
 
     void deleteByChannelId(int channelId);
 
-
+    void deleteByUserId(int userId);
 }

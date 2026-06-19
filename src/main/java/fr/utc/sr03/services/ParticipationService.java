@@ -7,6 +7,7 @@ import fr.utc.sr03.repository.ParticipationRepository;
 import jakarta.annotation.Resource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -182,6 +183,11 @@ public class ParticipationService {
             );
         }
         return channel;
+    }
+
+    @Transactional
+    public void deleteAllParticipationsForUser(int userId) {
+        participationRepository.deleteByUserId(userId);
     }
 
 }

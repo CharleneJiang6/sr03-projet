@@ -5,6 +5,8 @@ package fr.utc.sr03.controller;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import fr.utc.sr03.model.User;
+import fr.utc.sr03.repository.ParticipationRepository;
+import fr.utc.sr03.services.ParticipationService;
 import fr.utc.sr03.services.UserService;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -20,6 +22,9 @@ public class WebController {
     private static final Logger log = LoggerFactory.getLogger(WebController.class);
     @Resource
     private UserService userService;
+
+    @Resource
+    private ParticipationService participationService;
 
     @GetMapping(value = "/")
     public String root() {
@@ -51,7 +56,6 @@ public class WebController {
     }
 
 
-
     // Handle the form submission to create a new user
     @PostMapping(value = "/admin/users/create")
     public String createUser(Model model, @ModelAttribute User user) {
@@ -72,10 +76,6 @@ public class WebController {
         model.addAttribute("user", createdUser);
         return "admin/usercreated"; // Show the results of creating a new user
     }
-
-
-
-
 
 
     // Show the admin login form
@@ -133,8 +133,6 @@ public class WebController {
     }
 
 
-
-
     @GetMapping(value = "/admin/users")
     public String users(Model model, HttpSession session) {
 
@@ -156,9 +154,6 @@ public class WebController {
         model.addAttribute("users", userService.getInactiveUsers());
         return "admin/disabled-users";
     }
-
-
-
 
 
     @GetMapping(value = "/admin/users/disable/{id}")
@@ -190,13 +185,11 @@ public class WebController {
             return "redirect:/admin/users";
         }
 
+        participationService.deleteAllParticipationsForUser(id);
         userService.deleteUserById(id);
 
         return "redirect:/admin/users";
     }
-
-
-
 
 
 }
